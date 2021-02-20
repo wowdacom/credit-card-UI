@@ -1,5 +1,5 @@
 <template>
-  <div class="card rounded-lg overflow-hidden mx-auto">
+  <div class="card rounded-lg overflow-hidden mx-auto rounded-lg">
     <div class="card-front">
       <div class="card-logos flex justify-between">
         <div class="anti-fake-logo">
@@ -27,26 +27,51 @@
     </div>
     <div class="card-back"></div>
   </div>
-  <div class="card-info mx-auto">
-    <div class="card-number">
-      <div class="card-number-title">Card Number</div>
-      <input class="card-number-content" type="text" />
+  <div class="card-info mx-auto grid grid-rows-4 grid-flow-col gap-4">
+    <div class="card-info-number">
+      <label class="card-info-number-title">Card Number</label>
+      <input
+        class="card-info-number-content w-full border border-gray-400 rounded-lg"
+        type="text"
+      />
     </div>
-    <div class="card-holder">
-      <div class="card-holder-title">Card Holder</div>
-      <input class="card-holder-content" type="text" />
+    <div class="card-info-holder">
+      <label class="card-info-holder-title">Card Holder</label>
+      <input
+        class="card-info-holder-content w-full border border-gray-400 rounded-lg"
+        type="text"
+      />
     </div>
-    <div class="expiration-date-and-CVC">
-      <div class="expiration-date">
-        <div class="expiration-date-month"></div>
-        <div class="expiration-date-year"></div>
-        Expiration Date
+    <div class="expiration-date-and-CVC grid grid-cols-3 gap-x-4">
+      <div class="expiration-date-title col-span-2">Expiration Date</div>
+      <div class="CVC-title">CVC</div>
+      <div class="expiration-date-content col-span-2 flex">
+        <select
+          class="w-full h-full border border-gray-400 rounded-lg"
+          name="expiration-date-month"
+          id="expiration-date-month"
+        >
+          <option selected="selected">Month</option>
+          <option :key="item" v-for="item in 12">{{ item }}</option>
+        </select>
+        <select
+          class="w-full h-full border border-gray-400 rounded-lg"
+          name="expiration-date-year"
+          id="expiration-date-year"
+        >
+          <option selected="selected">Year</option>
+          <option v-for="item in getNumberRange(2020, 2030)">{{ item }}</option>
+        </select>
       </div>
-      <div class="CVC"></div>
+      <div class="CVC-content">
+        <input
+          class="w-full h-full border border-gray-400 rounded-lg"
+          type="text"
+        />
+      </div>
     </div>
-
     <div class="submit">
-      <button>Submit</button>
+      <button class="w-full h-full rounded-lg">Submit</button>
     </div>
   </div>
 </template>
@@ -66,6 +91,17 @@ const plusOne = computed({
     count.value = val - 1;
   },
 });
+
+const getNumberRange = (start, end) => {
+  let result = [],
+    count = start ?? 0;
+  while (count <= end) {
+    result.push(count);
+    count++;
+  }
+  console.log(result);
+  return result;
+};
 </script>
 
 <style lang="scss" scoped>
@@ -73,7 +109,6 @@ const plusOne = computed({
   max-width: 430px;
   width: 100%;
   height: 270px;
-  border-radius: 15px;
   overflow: hidden;
   background-color: yellow;
   -webkit-font-smoothing: antialiased;
@@ -152,7 +187,65 @@ const plusOne = computed({
   width: 100%;
   padding: 180px 35px 35px;
   z-index: 1;
-  .card-number {
+  .card-info-number {
+    .card-info-number-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #1a3b5d;
+    }
+    .card-info-number-content {
+      height: 50px;
+      padding: 5px 15px;
+    }
+  }
+  .card-info-holder {
+    .card-info-holder-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #1a3b5d;
+    }
+    .card-info-holder-content {
+      height: 50px;
+      padding: 5px 15px;
+    }
+  }
+  .expiration-date-and-CVC {
+    .expiration-date-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #1a3b5d;
+    }
+    .CVC-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #1a3b5d;
+    }
+    .expiration-date-content {
+      height: 50px;
+      #expiration-date-month {
+        margin-right: 8px;
+        padding: 5px 15px;
+      }
+      #expiration-date-year {
+        padding: 5px 15px;
+      }
+    }
+    .CVC-content {
+      height: 50px;
+      input {
+        padding: 5px 15px;
+      }
+    }
+  }
+  .submit {
+    height: 55px;
+    margin: 1em 0;
+    button {
+      background-color: #2364d2;
+      box-shadow: 3px 10px 20px 0 rgb(35 100 210 / 30%);
+      color: #fff;
+      font-size: 22px;
+    }
   }
 }
 </style>
