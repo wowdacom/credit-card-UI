@@ -1,6 +1,15 @@
 <template>
   <div class="card-wrapper rounded-lg overflow-hidden mx-auto rounded-lg">
-    <div class="card w-full h-full">
+    <div ref="card" class="card w-full h-full">
+      <div
+        class="card-marker"
+        :style="{
+          opacity: isAnyFocus,
+          height: `${markerCurrentHeight}px`,
+          width: `${markerCurrentWidth}px`,
+          transform: `translate(${markerCurrentPositionX}px,${markerCurrentPositionY}px)`,
+        }"
+      ></div>
       <div class="card-front">
         <div class="card-logos flex justify-between">
           <div class="anti-fake-logo">
@@ -52,12 +61,16 @@
     </div>
   </div>
 
-  <div class="card-info mx-auto grid grid-rows-4 grid-flow-col gap-4">
+  <div
+    ref="cardInfo"
+    class="card-info mx-auto grid grid-rows-4 grid-flow-col gap-4"
+  >
     <div class="card-info-number">
       <label class="card-info-number-title">Card Number</label>
       <input
         class="card-info-number-content w-full border border-gray-400 rounded-lg"
         type="text"
+        name="card-number"
       />
     </div>
     <div class="card-info-holder">
@@ -65,6 +78,7 @@
       <input
         class="card-info-holder-content w-full border border-gray-400 rounded-lg"
         type="text"
+        name="card-holder"
       />
     </div>
     <div class="expiration-date-and-CVC grid grid-cols-3 gap-x-4">
@@ -102,14 +116,22 @@
 </template>
 
 <script setup>
-import { defineProps, reactive, ref } from "vue";
+import { defineProps, reactive, ref, onMounted, onUnmounted } from "vue";
 
 defineProps({
   msg: String,
 });
 
-const owner = reactive("");
-const CVCnumber = reactive("CVC");
+const card = ref(null);
+const cardInfo = ref(null);
+const isAnyFocus = ref(0);
+const markerCurrentWidth = ref(0);
+const markerCurrentHeight = ref(0);
+const markerCurrentPositionX = ref(0);
+const markerCurrentPositionY = ref(0);
+
+const owner = ref("");
+const CVCnumber = ref("CVC");
 const getNumberRange = (start, end) => {
   let result = [],
     count = start ?? 0;
@@ -117,9 +139,44 @@ const getNumberRange = (start, end) => {
     result.push(count);
     count++;
   }
-  console.log(result);
   return result;
 };
+
+onMounted(() => {
+  let cardDOM = card.value;
+  let cardCodeDOM = cardDOM.querySelector(".card-code");
+  let cardMarkerDOM = cardDOM.querySelector(".card-marker");
+  let cardInfoDOM = cardInfo.value;
+  let cardNumberDOM = cardInfoDOM.querySelector('input[name="card-number"]');
+
+  cardNumberDOM.addEventListener("focus", (event) => {
+    isAnyFocus.value = 1;
+    markerCurrentPositionX.value =
+      cardCodeDOM.getBoundingClientRect().left -
+      cardDOM.getBoundingClientRect().left;
+
+    markerCurrentPositionY.value =
+      cardCodeDOM.getBoundingClientRect().top -
+      cardDOM.getBoundingClientRect().top;
+
+    console.log(cardCodeDOM.getBoundingClientRect().width);
+    markerCurrentWidth.value = cardCodeDOM.getBoundingClientRect().width;
+    markerCurrentHeight.value = cardCodeDOM.getBoundingClientRect().height;
+  });
+
+  cardNumberDOM.addEventListener("blur", (event) => {
+    isAnyFocus.value = 0;
+    markerCurrentPositionX.value = 0;
+    markerCurrentPositionY.value = 0;
+  });
+});
+onUnmounted(() => {
+  cardInfo.value
+    .querySelector('input[name="card-number"]')
+    .removeEventListener("focus", (event) => {
+      console.log("hello");
+    });
+});
 </script>
 
 <style lang="scss" scoped>
@@ -138,7 +195,13 @@ const getNumberRange = (start, end) => {
     &:hover {
       transform: rotateY(180deg);
     }
-
+    .card-marker {
+      position: absolute;
+      border: 2px solid hsla(0, 0%, 100%, 0.65);
+      border-radius: 5px;
+      z-index: 5;
+      transition: all 1s;
+    }
     .card-front {
       padding: 25px 15px;
       height: 100%;
