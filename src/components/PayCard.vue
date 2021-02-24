@@ -1,15 +1,11 @@
 <template>
   <div class="card-wrapper rounded-lg overflow-hidden mx-auto rounded-lg">
-    <div ref="card" class="card w-full h-full">
-      <div
-        class="card-marker"
-        :style="{
-          opacity: isAnyFocus,
-          height: `${markerCurrentHeight}px`,
-          width: `${markerCurrentWidth}px`,
-          transform: `translate(${markerCurrentPositionX}px,${markerCurrentPositionY}px)`,
-        }"
-      ></div>
+    <div
+      ref="card"
+      :style="{ transform: isBack ? 'rotateY(180deg)' : 'none' }"
+      class="card w-full h-full"
+    >
+      <div class="card-marker" :style="markerStyle"></div>
       <div class="card-front">
         <div class="card-logos flex justify-between">
           <div class="anti-fake-logo">
@@ -25,7 +21,7 @@
           }}</span>
         </div>
         <div class="card-content flex justify-between">
-          <div class="card-holder">
+          <div class="card-holder w-full pr-5">
             <div class="card-holder-title">Card Holder</div>
             <div class="card-holder-content text-white">FULL NAME</div>
           </div>
@@ -70,7 +66,7 @@
       <input
         class="card-info-number-content w-full border border-gray-400 rounded-lg"
         type="text"
-        name="card-number"
+        name="card-info-number"
       />
     </div>
     <div class="card-info-holder">
@@ -78,11 +74,12 @@
       <input
         class="card-info-holder-content w-full border border-gray-400 rounded-lg"
         type="text"
-        name="card-holder"
+        name="card-info-holder"
       />
     </div>
     <div class="expiration-date-and-CVC grid grid-cols-3 gap-x-4">
       <div class="expiration-date-title col-span-2">Expiration Date</div>
+      <div class="CVC-title">CVC</div>
 
       <div class="expiration-date-content col-span-2 flex">
         <select
@@ -106,6 +103,7 @@
         <input
           class="w-full h-full border border-gray-400 rounded-lg"
           type="text"
+          name="CVC-content"
         />
       </div>
     </div>
@@ -116,15 +114,26 @@
 </template>
 
 <script setup>
-import { defineProps, reactive, ref, onMounted, onUnmounted } from "vue";
+import {
+  defineProps,
+  reactive,
+  ref,
+  onMounted,
+  onUnmounted,
+  computed,
+} from "vue";
 
 defineProps({
   msg: String,
 });
 
+//2/24 要翻面完在抓位置，不然位置會跑掉
+//2/24 優化監聽的寫法
+
 const card = ref(null);
 const cardInfo = ref(null);
 const isAnyFocus = ref(0);
+const isBack = ref(false);
 const markerCurrentWidth = ref(0);
 const markerCurrentHeight = ref(0);
 const markerCurrentPositionX = ref(0);
@@ -145,12 +154,28 @@ const getNumberRange = (start, end) => {
 onMounted(() => {
   let cardDOM = card.value;
   let cardCodeDOM = cardDOM.querySelector(".card-code");
-  let cardMarkerDOM = cardDOM.querySelector(".card-marker");
+  let cardHolderDOM = cardDOM.querySelector(".card-holder");
+  let cardExpiresDOM = cardDOM.querySelector(".expires");
+  let cardCVCDOM = cardDOM.querySelector(".CVC");
   let cardInfoDOM = cardInfo.value;
-  let cardNumberDOM = cardInfoDOM.querySelector('input[name="card-number"]');
+  let cardNumberDOM = cardInfoDOM.querySelector(
+    'input[name="card-info-number"]'
+  );
+  let cardInfoHolderDOM = cardInfoDOM.querySelector(
+    'input[name="card-info-holder"]'
+  );
+
+  let expirationDataMonthDOM = cardInfoDOM.querySelector(
+    'select[name="expiration-date-month"]'
+  );
+  let expirationDataYearDOM = cardInfoDOM.querySelector(
+    'select[name="expiration-date-year"]'
+  );
+  let CVCContentDOM = cardInfoDOM.querySelector('input[name="CVC-content"]');
 
   cardNumberDOM.addEventListener("focus", (event) => {
     isAnyFocus.value = 1;
+    isBack.value = false;
     markerCurrentPositionX.value =
       cardCodeDOM.getBoundingClientRect().left -
       cardDOM.getBoundingClientRect().left;
@@ -166,10 +191,96 @@ onMounted(() => {
 
   cardNumberDOM.addEventListener("blur", (event) => {
     isAnyFocus.value = 0;
-    markerCurrentPositionX.value = 0;
-    markerCurrentPositionY.value = 0;
+  });
+
+  cardInfoHolderDOM.addEventListener("focus", (event) => {
+    isAnyFocus.value = 1;
+    isBack.value = false;
+    markerCurrentPositionX.value =
+      cardHolderDOM.getBoundingClientRect().left -
+      cardDOM.getBoundingClientRect().left;
+
+    markerCurrentPositionY.value =
+      cardHolderDOM.getBoundingClientRect().top -
+      cardDOM.getBoundingClientRect().top;
+
+    markerCurrentWidth.value = cardHolderDOM.getBoundingClientRect().width;
+    markerCurrentHeight.value = cardHolderDOM.getBoundingClientRect().height;
+  });
+
+  cardInfoHolderDOM.addEventListener("blur", (event) => {
+    isAnyFocus.value = 0;
+  });
+
+  expirationDataMonthDOM.addEventListener("focus", (event) => {
+    isAnyFocus.value = 1;
+    isBack.value = false;
+    markerCurrentPositionX.value =
+      cardExpiresDOM.getBoundingClientRect().left -
+      cardDOM.getBoundingClientRect().left;
+
+    markerCurrentPositionY.value =
+      cardExpiresDOM.getBoundingClientRect().top -
+      cardDOM.getBoundingClientRect().top;
+
+    markerCurrentWidth.value = cardExpiresDOM.getBoundingClientRect().width;
+    markerCurrentHeight.value = cardExpiresDOM.getBoundingClientRect().height;
+  });
+
+  expirationDataMonthDOM.addEventListener("blur", (event) => {
+    isAnyFocus.value = 0;
+  });
+
+  expirationDataYearDOM.addEventListener("focus", (event) => {
+    isAnyFocus.value = 1;
+    isBack.value = false;
+    markerCurrentPositionX.value =
+      cardExpiresDOM.getBoundingClientRect().left -
+      cardDOM.getBoundingClientRect().left;
+
+    markerCurrentPositionY.value =
+      cardExpiresDOM.getBoundingClientRect().top -
+      cardDOM.getBoundingClientRect().top;
+
+    markerCurrentWidth.value = cardExpiresDOM.getBoundingClientRect().width;
+    markerCurrentHeight.value = cardExpiresDOM.getBoundingClientRect().height;
+  });
+
+  expirationDataYearDOM.addEventListener("blur", (event) => {
+    isAnyFocus.value = 0;
+  });
+
+  CVCContentDOM.addEventListener("focus", (event) => {
+    isAnyFocus.value = 1;
+    isBack.value = true;
+    markerCurrentPositionX.value =
+      cardCVCDOM.getBoundingClientRect().left -
+      cardDOM.getBoundingClientRect().left;
+
+    markerCurrentPositionY.value =
+      cardCVCDOM.getBoundingClientRect().top -
+      cardDOM.getBoundingClientRect().top;
+
+    markerCurrentWidth.value = cardCVCDOM.getBoundingClientRect().width;
+    markerCurrentHeight.value = cardCVCDOM.getBoundingClientRect().height;
+  });
+
+  CVCContentDOM.addEventListener("blur", (event) => {
+    isAnyFocus.value = 0;
   });
 });
+
+const markerStyle = computed(() => {
+  return {
+    opacity: isAnyFocus.value,
+    height: `${markerCurrentHeight.value}px`,
+    width: `${markerCurrentWidth.value}px`,
+    transform: isBack.value
+      ? `translate(${markerCurrentPositionX.value}px,${markerCurrentPositionY.value}px) rotateY(180deg)`
+      : `translate(${markerCurrentPositionX.value}px,${markerCurrentPositionY.value}px)`,
+  };
+});
+
 onUnmounted(() => {
   cardInfo.value
     .querySelector('input[name="card-number"]')
@@ -192,14 +303,15 @@ onUnmounted(() => {
     position: sticky;
     transform-style: preserve-3d;
     transition: 0.5s all ease;
-    &:hover {
-      transform: rotateY(180deg);
-    }
+    transform: rotateY(180deg);
+    // &:hover {
+    //   transform: rotateY(180deg);
+    // }
     .card-marker {
       position: absolute;
       border: 2px solid hsla(0, 0%, 100%, 0.65);
       border-radius: 5px;
-      z-index: 5;
+      z-index: 5000;
       transition: all 1s;
     }
     .card-front {
@@ -236,8 +348,8 @@ onUnmounted(() => {
       }
       .card-content {
         text-align: left;
-        padding: 10px 15px;
         .card-holder {
+          padding: 10px 15px;
           .card-holder-title {
             opacity: 0.7;
             font-size: 13px;
@@ -251,6 +363,7 @@ onUnmounted(() => {
           }
         }
         .expires {
+          padding: 10px 15px;
           .expires-title {
             opacity: 0.7;
             font-size: 13px;
