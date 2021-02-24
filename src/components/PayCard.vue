@@ -7,27 +7,29 @@
     >
       <div class="card-marker" :style="markerStyle"></div>
       <div class="card-front">
-        <div class="card-logos flex justify-between">
-          <div class="anti-fake-logo">
-            <img src="https://i.imgur.com/7xhP2ZA.png" alt="" />
+        <div class="card-front-content">
+          <div class="card-logos flex justify-between">
+            <div class="anti-fake-logo">
+              <img src="https://i.imgur.com/7xhP2ZA.png" alt="" />
+            </div>
+            <div class="visa-logo">
+              <img src="https://i.imgur.com/lokBLnp.png" alt="" />
+            </div>
           </div>
-          <div class="visa-logo">
-            <img src="https://i.imgur.com/lokBLnp.png" alt="" />
+          <div class="card-code text-white">
+            <span class="card-code-number" v-for="item in 20">{{
+              item % 5 === 0 ? " " : "#"
+            }}</span>
           </div>
-        </div>
-        <div class="card-code text-white">
-          <span class="card-code-number" v-for="item in 20">{{
-            item % 5 === 0 ? " " : "#"
-          }}</span>
-        </div>
-        <div class="card-content flex justify-between">
-          <div class="card-holder w-full pr-5">
-            <div class="card-holder-title">Card Holder</div>
-            <div class="card-holder-content text-white">FULL NAME</div>
-          </div>
-          <div class="expires">
-            <div class="expires-title">Expires</div>
-            <div class="expires-content text-white">MM/YY</div>
+          <div class="card-content flex justify-between">
+            <div class="card-holder w-full pr-5">
+              <div class="card-holder-title">Card Holder</div>
+              <div class="card-holder-content text-white">FULL NAME</div>
+            </div>
+            <div class="expires">
+              <div class="expires-title">Expires</div>
+              <div class="expires-content text-white">MM/YY</div>
+            </div>
           </div>
         </div>
       </div>
@@ -173,6 +175,8 @@ onMounted(() => {
   );
   let CVCContentDOM = cardInfoDOM.querySelector('input[name="CVC-content"]');
 
+  let changePostion = (cardBox) => {};
+
   cardNumberDOM.addEventListener("focus", (event) => {
     isAnyFocus.value = 1;
     isBack.value = false;
@@ -184,7 +188,6 @@ onMounted(() => {
       cardCodeDOM.getBoundingClientRect().top -
       cardDOM.getBoundingClientRect().top;
 
-    console.log(cardCodeDOM.getBoundingClientRect().width);
     markerCurrentWidth.value = cardCodeDOM.getBoundingClientRect().width;
     markerCurrentHeight.value = cardCodeDOM.getBoundingClientRect().height;
   });
@@ -252,6 +255,7 @@ onMounted(() => {
 
   CVCContentDOM.addEventListener("focus", (event) => {
     isAnyFocus.value = 1;
+
     isBack.value = true;
     markerCurrentPositionX.value =
       cardCVCDOM.getBoundingClientRect().left -
@@ -261,6 +265,10 @@ onMounted(() => {
       cardCVCDOM.getBoundingClientRect().top -
       cardDOM.getBoundingClientRect().top;
 
+    console.log(cardDOM.getBoundingClientRect().width);
+    console.log(cardCVCDOM.getBoundingClientRect().left);
+    console.log(cardDOM.getBoundingClientRect().left);
+    console.log(markerCurrentPositionX.value);
     markerCurrentWidth.value = cardCVCDOM.getBoundingClientRect().width;
     markerCurrentHeight.value = cardCVCDOM.getBoundingClientRect().height;
   });
@@ -304,76 +312,78 @@ onUnmounted(() => {
     transform-style: preserve-3d;
     transition: 0.5s all ease;
     transform: rotateY(180deg);
-    // &:hover {
-    //   transform: rotateY(180deg);
-    // }
+    &:hover {
+      transform: rotateY(180deg);
+    }
     .card-marker {
       position: absolute;
       border: 2px solid hsla(0, 0%, 100%, 0.65);
       border-radius: 5px;
-      z-index: 5000;
       transition: all 1s;
+      z-index: 1000;
     }
     .card-front {
-      padding: 25px 15px;
       height: 100%;
       width: 100%;
       background-image: url("https://i.imgur.com/5XHCjPT.jpg");
       background-size: cover;
       position: absolute;
       backface-visibility: hidden;
-      .card-logos {
-        height: 45px;
-        margin-bottom: 40px;
-        padding: 0 10px;
-        .anti-fake-logo {
-          height: 100%;
-          img {
-            height: inherit;
+      .card-front-content {
+        padding: 25px 15px;
+        .card-logos {
+          height: 45px;
+          margin-bottom: 40px;
+          padding: 0 10px;
+          .anti-fake-logo {
+            height: 100%;
+            img {
+              height: inherit;
+            }
+          }
+          .visa-logo {
+            height: 100%;
+            img {
+              height: inherit;
+            }
           }
         }
-        .visa-logo {
-          height: 100%;
-          img {
-            height: inherit;
-          }
-        }
-      }
-      .card-code {
-        margin-bottom: 25px;
-        padding: 10px 15px;
-        .card-code-number {
-          font-size: 28px;
-        }
-      }
-      .card-content {
-        text-align: left;
-        .card-holder {
+        .card-code {
+          margin-bottom: 25px;
           padding: 10px 15px;
-          .card-holder-title {
-            opacity: 0.7;
-            font-size: 13px;
-            --tw-text-opacity: 1;
-            color: rgba(255, 255, 255, var(--tw-text-opacity));
-          }
-          .card-holder-content {
-            font-size: 18px;
-            white-space: nowrap;
-            text-transform: uppercase;
+          .card-code-number {
+            font-size: 28px;
           }
         }
-        .expires {
-          padding: 10px 15px;
-          .expires-title {
-            opacity: 0.7;
-            font-size: 13px;
-            --tw-text-opacity: 1;
-            color: rgba(255, 255, 255, var(--tw-text-opacity));
+        .card-content {
+          text-align: left;
+          .card-holder {
+            padding: 10px 15px;
+            .card-holder-title {
+              opacity: 0.7;
+              font-size: 13px;
+              --tw-text-opacity: 1;
+              color: rgba(255, 255, 255, var(--tw-text-opacity));
+            }
+            .card-holder-content {
+              font-size: 18px;
+              white-space: nowrap;
+              text-transform: uppercase;
+            }
           }
-          .expires-content {
-            font-size: 18px;
-            white-space: nowrap;
-            text-transform: uppercase;
+          .expires {
+            padding: 10px 15px;
+            .expires-title {
+              opacity: 0.7;
+              font-size: 13px;
+              --tw-text-opacity: 1;
+              color: rgba(255, 255, 255, var(--tw-text-opacity));
+            }
+            .expires-content {
+              font-size: 18px;
+              white-space: nowrap;
+              text-transform: uppercase;
+            }
           }
         }
       }
