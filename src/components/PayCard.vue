@@ -72,7 +72,8 @@
         name="card-info-number"
         autocomplete="off"
         maxlength="19"
-        v-model="number"
+        :value="number"
+        @keyup="handleInputNumber"
       />
     </div>
     <div class="card-info-holder">
@@ -155,6 +156,10 @@ const markerCurrentPositionX = ref(0);
 const markerCurrentPositionY = ref(0);
 
 const number = ref("");
+const handleInputNumber = function (val) {
+  number.value = number.value + `${val.key}` + 1;
+  console.log(val);
+};
 
 const name = ref("");
 const nameCard = computed(() => {
