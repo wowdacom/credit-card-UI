@@ -5,8 +5,8 @@
       :style="{ transform: isBack ? 'rotateY(180deg)' : 'none' }"
       class="card w-full h-full"
     >
-      <div class="card-marker" :style="markerStyle"></div>
       <div class="card-front">
+        <div class="card-marker" :style="markerStyle"></div>
         <div class="card-front-content">
           <div class="card-logos flex justify-between">
             <div class="anti-fake-logo">
@@ -34,6 +34,7 @@
         </div>
       </div>
       <div class="card-back">
+        <div class="card-marker" :style="markerStyle"></div>
         <div class="card-black-line"></div>
         <div class="name-and-CVC">
           <div class="name">
@@ -136,6 +137,7 @@ const card = ref(null);
 const cardInfo = ref(null);
 const isAnyFocus = ref(0);
 const isBack = ref(false);
+const currentSide = ref("front");
 const markerCurrentWidth = ref(0);
 const markerCurrentHeight = ref(0);
 const markerCurrentPositionX = ref(0);
@@ -178,15 +180,25 @@ onMounted(() => {
   let changePostion = (cardBox) => {};
 
   cardNumberDOM.addEventListener("focus", (event) => {
-    isAnyFocus.value = 1;
-    isBack.value = false;
-    markerCurrentPositionX.value =
-      cardCodeDOM.getBoundingClientRect().left -
-      cardDOM.getBoundingClientRect().left;
+    if (currentSide.value === "front" && isBack.value === false) {
+      markerCurrentPositionX.value =
+        cardCodeDOM.getBoundingClientRect().left -
+        cardDOM.getBoundingClientRect().left;
+    } else {
+      markerCurrentPositionX.value =
+        cardDOM.getBoundingClientRect().width -
+        (cardCodeDOM.getBoundingClientRect().left -
+          cardDOM.getBoundingClientRect().left) -
+        cardCodeDOM.getBoundingClientRect().width;
+    }
 
     markerCurrentPositionY.value =
       cardCodeDOM.getBoundingClientRect().top -
       cardDOM.getBoundingClientRect().top;
+
+    isAnyFocus.value = 1;
+    isBack.value = false;
+    currentSide.value = "front";
 
     markerCurrentWidth.value = cardCodeDOM.getBoundingClientRect().width;
     markerCurrentHeight.value = cardCodeDOM.getBoundingClientRect().height;
@@ -197,15 +209,25 @@ onMounted(() => {
   });
 
   cardInfoHolderDOM.addEventListener("focus", (event) => {
-    isAnyFocus.value = 1;
-    isBack.value = false;
-    markerCurrentPositionX.value =
-      cardHolderDOM.getBoundingClientRect().left -
-      cardDOM.getBoundingClientRect().left;
+    if (currentSide.value === "front" && isBack.value === false) {
+      markerCurrentPositionX.value =
+        cardHolderDOM.getBoundingClientRect().left -
+        cardDOM.getBoundingClientRect().left;
+    } else {
+      markerCurrentPositionX.value =
+        cardDOM.getBoundingClientRect().width -
+        (cardHolderDOM.getBoundingClientRect().left -
+          cardDOM.getBoundingClientRect().left) -
+        cardHolderDOM.getBoundingClientRect().width;
+    }
 
     markerCurrentPositionY.value =
       cardHolderDOM.getBoundingClientRect().top -
       cardDOM.getBoundingClientRect().top;
+
+    isAnyFocus.value = 1;
+    isBack.value = false;
+    currentSide.value = "front";
 
     markerCurrentWidth.value = cardHolderDOM.getBoundingClientRect().width;
     markerCurrentHeight.value = cardHolderDOM.getBoundingClientRect().height;
@@ -216,15 +238,25 @@ onMounted(() => {
   });
 
   expirationDataMonthDOM.addEventListener("focus", (event) => {
-    isAnyFocus.value = 1;
-    isBack.value = false;
-    markerCurrentPositionX.value =
-      cardExpiresDOM.getBoundingClientRect().left -
-      cardDOM.getBoundingClientRect().left;
+    if (currentSide.value === "front" && isBack.value === false) {
+      markerCurrentPositionX.value =
+        cardExpiresDOM.getBoundingClientRect().left -
+        cardDOM.getBoundingClientRect().left;
+    } else {
+      markerCurrentPositionX.value =
+        cardDOM.getBoundingClientRect().width -
+        (cardExpiresDOM.getBoundingClientRect().left -
+          cardDOM.getBoundingClientRect().left) -
+        cardExpiresDOM.getBoundingClientRect().width;
+    }
 
     markerCurrentPositionY.value =
       cardExpiresDOM.getBoundingClientRect().top -
       cardDOM.getBoundingClientRect().top;
+
+    isAnyFocus.value = 1;
+    isBack.value = false;
+    currentSide.value = "front";
 
     markerCurrentWidth.value = cardExpiresDOM.getBoundingClientRect().width;
     markerCurrentHeight.value = cardExpiresDOM.getBoundingClientRect().height;
@@ -235,15 +267,25 @@ onMounted(() => {
   });
 
   expirationDataYearDOM.addEventListener("focus", (event) => {
-    isAnyFocus.value = 1;
-    isBack.value = false;
-    markerCurrentPositionX.value =
-      cardExpiresDOM.getBoundingClientRect().left -
-      cardDOM.getBoundingClientRect().left;
+    if (currentSide.value === "front" && isBack.value === false) {
+      markerCurrentPositionX.value =
+        cardExpiresDOM.getBoundingClientRect().left -
+        cardDOM.getBoundingClientRect().left;
+    } else {
+      markerCurrentPositionX.value =
+        cardDOM.getBoundingClientRect().width -
+        (cardExpiresDOM.getBoundingClientRect().left -
+          cardDOM.getBoundingClientRect().left) -
+        cardExpiresDOM.getBoundingClientRect().width;
+    }
 
     markerCurrentPositionY.value =
       cardExpiresDOM.getBoundingClientRect().top -
       cardDOM.getBoundingClientRect().top;
+
+    isAnyFocus.value = 1;
+    isBack.value = false;
+    currentSide.value = "front";
 
     markerCurrentWidth.value = cardExpiresDOM.getBoundingClientRect().width;
     markerCurrentHeight.value = cardExpiresDOM.getBoundingClientRect().height;
@@ -254,21 +296,26 @@ onMounted(() => {
   });
 
   CVCContentDOM.addEventListener("focus", (event) => {
-    isAnyFocus.value = 1;
-
-    isBack.value = true;
-    markerCurrentPositionX.value =
-      cardCVCDOM.getBoundingClientRect().left -
-      cardDOM.getBoundingClientRect().left;
+    if (currentSide.value === "back" && isBack.value === true) {
+      markerCurrentPositionX.value =
+        cardCVCDOM.getBoundingClientRect().left -
+        cardDOM.getBoundingClientRect().left;
+    } else {
+      markerCurrentPositionX.value =
+        cardDOM.getBoundingClientRect().width -
+        (cardCVCDOM.getBoundingClientRect().left -
+          cardDOM.getBoundingClientRect().left) -
+        cardCVCDOM.getBoundingClientRect().width;
+    }
 
     markerCurrentPositionY.value =
       cardCVCDOM.getBoundingClientRect().top -
       cardDOM.getBoundingClientRect().top;
 
-    console.log(cardDOM.getBoundingClientRect().width);
-    console.log(cardCVCDOM.getBoundingClientRect().left);
-    console.log(cardDOM.getBoundingClientRect().left);
-    console.log(markerCurrentPositionX.value);
+    isAnyFocus.value = 1;
+    isBack.value = true;
+    currentSide.value = "back";
+
     markerCurrentWidth.value = cardCVCDOM.getBoundingClientRect().width;
     markerCurrentHeight.value = cardCVCDOM.getBoundingClientRect().height;
   });
@@ -284,7 +331,7 @@ const markerStyle = computed(() => {
     height: `${markerCurrentHeight.value}px`,
     width: `${markerCurrentWidth.value}px`,
     transform: isBack.value
-      ? `translate(${markerCurrentPositionX.value}px,${markerCurrentPositionY.value}px) rotateY(180deg)`
+      ? `translate(${markerCurrentPositionX.value}px,${markerCurrentPositionY.value}px)`
       : `translate(${markerCurrentPositionX.value}px,${markerCurrentPositionY.value}px)`,
   };
 });
@@ -315,13 +362,7 @@ onUnmounted(() => {
     &:hover {
       transform: rotateY(180deg);
     }
-    .card-marker {
-      position: absolute;
-      border: 2px solid hsla(0, 0%, 100%, 0.65);
-      border-radius: 5px;
-      transition: all 1s;
-      z-index: 1000;
-    }
+
     .card-front {
       height: 100%;
       width: 100%;
@@ -329,6 +370,12 @@ onUnmounted(() => {
       background-size: cover;
       position: absolute;
       backface-visibility: hidden;
+      .card-marker {
+        position: absolute;
+        border: 2px solid hsla(0, 0%, 100%, 0.65);
+        border-radius: 5px;
+        transition: all 1s;
+      }
       .card-front-content {
         padding: 25px 15px;
         .card-logos {
@@ -397,6 +444,12 @@ onUnmounted(() => {
       backface-visibility: hidden;
       transform: rotateY(180deg);
       text-align: right;
+      .card-marker {
+        position: absolute;
+        border: 2px solid hsla(0, 0%, 100%, 0.65);
+        border-radius: 5px;
+        transition: all 1s;
+      }
       .card-black-line {
         margin-top: 30px;
         background-color: #000;
