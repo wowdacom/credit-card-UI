@@ -24,11 +24,13 @@
           <div class="card-content flex justify-between">
             <div class="card-holder w-full pr-5">
               <div class="card-holder-title">Card Holder</div>
-              <div class="card-holder-content text-white">FULL NAME</div>
+              <div class="card-holder-content text-white">{{ nameCard }}</div>
             </div>
             <div class="expires">
               <div class="expires-title">Expires</div>
-              <div class="expires-content text-white">MM/YY</div>
+              <div class="expires-content text-white">
+                {{ monthCard }}/{{ yearCard }}
+              </div>
             </div>
           </div>
         </div>
@@ -46,11 +48,9 @@
             <input class="name-content w-full" type="text" v-model="owner" />
           </div>
           <div class="CVC">
-            <input
-              class="CVC-content text-white"
-              type="text"
-              v-model="CVCnumber"
-            />
+            <div class="CVC-content text-white">
+              {{ CVCCard }}
+            </div>
           </div>
         </div>
         <div class="visa-logo">
@@ -70,6 +70,9 @@
         class="card-info-number-content w-full border border-gray-400 rounded-lg"
         type="text"
         name="card-info-number"
+        autocomplete="off"
+        maxlength="19"
+        v-model="number"
       />
     </div>
     <div class="card-info-holder">
@@ -78,6 +81,9 @@
         class="card-info-holder-content w-full border border-gray-400 rounded-lg"
         type="text"
         name="card-info-holder"
+        autocomplete="off"
+        maxlength="20"
+        v-model="name"
       />
     </div>
     <div class="expiration-date-and-CVC grid grid-cols-3 gap-x-4">
@@ -89,6 +95,7 @@
           class="w-full h-full border border-gray-400 rounded-lg"
           name="expiration-date-month"
           id="expiration-date-month"
+          v-model="month"
         >
           <option selected="selected">Month</option>
           <option :key="item" v-for="item in 12">{{ item }}</option>
@@ -97,6 +104,7 @@
           class="w-full h-full border border-gray-400 rounded-lg"
           name="expiration-date-year"
           id="expiration-date-year"
+          v-model="year"
         >
           <option selected="selected">Year</option>
           <option v-for="item in getNumberRange(2020, 2030)">{{ item }}</option>
@@ -107,6 +115,9 @@
           class="w-full h-full border border-gray-400 rounded-lg"
           type="text"
           name="CVC-content"
+          maxlength="3"
+          v-model="CVC"
+          @keypress="isNumber($event)"
         />
       </div>
     </div>
@@ -143,8 +154,43 @@ const markerCurrentHeight = ref(0);
 const markerCurrentPositionX = ref(0);
 const markerCurrentPositionY = ref(0);
 
+const number = ref("");
+
+const name = ref("");
+const nameCard = computed(() => {
+  if (name.value === "") {
+    return "FULL NAME";
+  }
+  return name.value;
+});
+const month = ref("Month");
+const monthCard = computed(() => {
+  if (month.value === "Month") {
+    return "MM";
+  } else if (month.value < 10) {
+    return `0${month.value}`;
+  } else {
+    return month.value;
+  }
+});
+const year = ref("Year");
+const yearCard = computed(() => {
+  if (year.value === "Year") {
+    return "YY";
+  } else {
+    return year.value.substring(2);
+  }
+});
+const CVC = ref("");
+const CVCCard = computed(() => {
+  if (CVC.value === "") {
+    return "CVC";
+  } else {
+    return CVC.value;
+  }
+});
+
 const owner = ref("");
-const CVCnumber = ref("CVC");
 const getNumberRange = (start, end) => {
   let result = [],
     count = start ?? 0;
@@ -336,6 +382,16 @@ const markerStyle = computed(() => {
   };
 });
 
+const isNumber = function (evt) {
+  evt = evt ? evt : window.event;
+  var charCode = evt.which ? evt.which : evt.keyCode;
+  if (charCode > 31 && (charCode < 48 || charCode > 57) && charCode !== 46) {
+    evt.preventDefault();
+  } else {
+    return true;
+  }
+};
+
 onUnmounted(() => {
   cardInfo.value
     .querySelector('input[name="card-number"]')
@@ -496,9 +552,9 @@ onUnmounted(() => {
           }
         }
         .CVC {
+          padding: 0 5px;
+          min-width: 2.5rem;
           .CVC-content {
-            width: 2rem;
-            margin-left: 5px;
             background-color: transparent;
           }
         }
