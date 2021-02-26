@@ -67,13 +67,13 @@
     <div class="card-info-number">
       <label class="card-info-number-title">Card Number</label>
       <input
+        id="card-info-number-content"
         class="card-info-number-content w-full border border-gray-400 rounded-lg"
         type="text"
         name="card-info-number"
         autocomplete="off"
         maxlength="19"
-        :value="number"
-        @keyup="handleInputNumber"
+        v-model="numberFilter"
       />
     </div>
     <div class="card-info-holder">
@@ -96,6 +96,7 @@
           class="w-full h-full border border-gray-400 rounded-lg"
           name="expiration-date-month"
           id="expiration-date-month"
+          @keydown="handleFilter"
           v-model="month"
         >
           <option selected="selected">Month</option>
@@ -156,10 +157,35 @@ const markerCurrentPositionX = ref(0);
 const markerCurrentPositionY = ref(0);
 
 const number = ref("");
-const handleInputNumber = function (val) {
-  number.value = number.value + `${val.key}` + 1;
-  console.log(val);
+
+const handleFilter = function (e) {
+  e.preventDefault();
 };
+
+const numberFilter = computed({
+  get: function () {
+    return number.value;
+  },
+  // setter
+  set: function (newValue) {
+    const re = /^(\d{0,4}\s?){0,4}$/;
+
+    const newCardNumber = newValue.replace(/\s/g, "");
+    let cardNumber = "";
+
+    for (let i = 0; i < newCardNumber.length; i++) {
+      cardNumber += newCardNumber.charAt(i);
+      if ([3, 7, 11].includes(i)) {
+        cardNumber += " ";
+      }
+    }
+    cardNumber = cardNumber.trim();
+    if (newCardNumber === "" || re.test(newCardNumber)) {
+      number.value = cardNumber;
+    }
+    document.querySelector("#card-info-number-content").value = number.value;
+  },
+});
 
 const name = ref("");
 const nameCard = computed(() => {
